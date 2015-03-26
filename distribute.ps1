@@ -20,7 +20,7 @@ New-Item -ItemType directory -Path $archiveFolder
 
 # コピー
 # full
-xcopy /Y /R /S /EXCLUDE:full.exclude "$buildFolder\*" "$archiveFolder"
+xcopy /Y /R /S /EXCLUDE:exclude.txt "$buildFolder\*" "$archiveFolder"
 
 # アーカイブ
 New-ZipCompress -source $archiveFolder -destination "$archiveFolder.zip"
