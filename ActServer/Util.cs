@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RainbowMage.MiniParseServer
+namespace RainbowMage.ActServer
 {
     static class Util
     {
@@ -16,11 +16,14 @@ namespace RainbowMage.MiniParseServer
         public static string CreateJsonSafeString(string str)
         {
             return str
-                .Replace("\"", "\\\"")
-                .Replace("'", "\\'")
-                .Replace("\r", "\\r")
-                .Replace("\n", "\\n")
-                .Replace("\t", "\\t");
+                .Replace("\"", "\\\"") // quotation mark
+                .Replace("\\", "\\\\") // reverse solidus
+                // escaping solidus are not required 
+                .Replace("\b", "\\b")  // backspace
+                .Replace("\f", "\\f")  // form feed
+                .Replace("\n", "\\n")  // line feed
+                .Replace("\r", "\\r")  // carriage return
+                .Replace("\t", "\\t"); // tab
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ if not exist %DOTNET_PATH% (
 )
 
 
-%DOTNET_PATH%\msbuild /t:Rebuild /p:Configuration=Release /p:OutputPath="%~dp0\Build" "%~dp0\MiniParseServer.sln"
+%DOTNET_PATH%\msbuild /t:Clean;Build /p:Configuration=Release /p:OutputPath="%~dp0\Build" "%~dp0\ActServer.sln"
 
 
 :END

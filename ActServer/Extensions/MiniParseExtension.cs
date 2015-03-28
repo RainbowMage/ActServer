@@ -5,23 +5,29 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RainbowMage.MiniParseServer
+namespace RainbowMage.ActServer.Extensions
 {
-    class Server
+    public class MiniParseExtension : IExtension
     {
-        private HttpListener listener;
-        private CancellationTokenSource cancellationTokenSource;
-        private bool running = false;
-        private int port;
+        #region IExtension
+        public string ExtensionName
+        {
+            get { return "RainbowMage.MiniParse"; }
+        }
 
-        private static string updateStringCache = "";
-        private static DateTime updateStringCacheLastUpdate;
-        private static readonly TimeSpan updateStringCacheExpireInterval = new TimeSpan(0, 0, 0, 0, 500); // 500 msec
+        public string DisplayName
+        {
+            get { return "Mini parse"; }
+        }
+
+        public string Description
+        {
+            get { return "Provides JSON data about combat."; }
+        }
 
         public enum SortType
         {
@@ -32,94 +38,41 @@ namespace RainbowMage.MiniParseServer
             NumericDescending
         }
 
-        public Server(int port)
+        public void ProcessRequest(HttpListenerContext context, CancellationToken token)
         {
-            this.port = port;
+            var sortKey = context.Request.QueryString.Get("sortKey");
+            SortType sortType;
+            var sortTypeString = context.Request.QueryString.Get("sortType");
+            Enum.TryParse(sortTypeString, true, out sortType);
+
+            Server.SendJsonResponse(context, CreateJsonData(sortKey, sortType, token));
+        }
+        #endregion
+
+        public void Dispose()
+        {
+
         }
 
-        public void Start()
-        {
-            if (this.running)
-            {
-                return;
-            }
+        private static string updateStringCache = "";
+        private static DateTime updateStringCacheLastUpdate;
+        private static readonly TimeSpan updateStringCacheExpireInterval = new TimeSpan(0, 0, 0, 0, 500); // 500 msec
 
-            this.running = true;
-
-            this.listener = new HttpListener();
-            this.listener.Prefixes.Add(string.Format("http://*:{0}/", port));
-
-            this.cancellationTokenSource = new CancellationTokenSource();
-            this.listener.Start();
-
-            var token = cancellationTokenSource.Token;
-            Task.Run(() =>
-            {
-                while (!token.IsCancellationRequested)
-                {
-                    var result = this.listener.BeginGetContext(new AsyncCallback(ListenerCallback), listener);
-                    result.AsyncWaitHandle.WaitOne(500);
-                }
-            }, token);
-        }
-
-        private void ListenerCallback(IAsyncResult result)
-        {
-            try
-            {
-                var listener = (HttpListener)result.AsyncState;
-                if (listener.IsListening)
-                {
-                    var context = listener.EndGetContext(result);
-                    var sortKey = context.Request.QueryString.Get("sortKey");
-                    SortType sortType;
-                    var sortTypeString = context.Request.QueryString.Get("sortType");
-                    Enum.TryParse(sortTypeString, true, out sortType);
-                    
-                    context.Response.StatusCode = (int)HttpStatusCode.OK;
-                    context.Response.ContentType = "application/json";
-                    context.Response.ContentEncoding = Encoding.UTF8;
-                    context.Response.AppendHeader("Access-Control-Allow-Origin", "*");
-
-                    var writer = new StreamWriter(context.Response.OutputStream);
-                    writer.Write(CreateJsonData(sortKey, sortType));
-                    writer.Flush();
-                    context.Response.Close();
-                }
-            }
-            catch
-            {
-                return;
-            }
-        }
-
-        public void Stop()
-        {
-            if (cancellationTokenSource != null)
-            {
-                cancellationTokenSource.Cancel();
-                cancellationTokenSource.Token.WaitHandle.WaitOne(1000);
-                cancellationTokenSource.Dispose();
-                listener.Close();
-                this.running = false;
-            }
-        }
-
-        internal string CreateJsonData(string sortKey, SortType sortType)
+        internal string CreateJsonData(string sortKey, SortType sortType, CancellationToken token)
         {
             if (DateTime.Now - updateStringCacheLastUpdate < updateStringCacheExpireInterval)
             {
                 return updateStringCache;
             }
 
-            while (!cancellationTokenSource.Token.IsCancellationRequested && !CheckIsActReady())
+            while (!token.IsCancellationRequested && !CheckIsActReady())
             {
                 Thread.Sleep(100);
             }
 
             if (!CheckIsActReady())
             {
-                return "{}";
+                return "{ \"_error\": \"Server stopped.\" }";
             }
 
 #if DEBUG

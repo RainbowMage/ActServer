@@ -1,10 +1,10 @@
-# MiniParseServer
+# ActServer
 
-ACT plugin to serve JSON formatted mini parse data using HttpListener.
-
-This is just a test piece. Would not be maintained.
+ACT plugin to serve JSON formatted data using HttpListener.
 
 Combination of this plugin and OBS CLR Browser Source Plugin would be nice.
+
+This is just a test piece. Would not be maintained.
 
 # Usage
 

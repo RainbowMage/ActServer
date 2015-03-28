@@ -4,11 +4,11 @@
 ./build.bat
 
 # バージョン取得
-$version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo("Build\MiniParseServer.dll").FileVersion
+$version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo("Build\ActServer.dll").FileVersion
 
 # フォルダ名
 $buildFolder = ".\Build"
-$archiveFolder = ".\Distribute\MiniParseServer-" + $version
+$archiveFolder = ".\Distribute\ActServer-" + $version
 
 # フォルダが既に存在するなら消去
 if ( Test-Path $archiveFolder -PathType Container ) {
