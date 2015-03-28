@@ -153,7 +153,7 @@
 
         $(document).ready(function () {
 
-            var server = "http://localhost:23456";
+            var server = "http://localhost:23456/actserver";
             var dataType = "RainbowMage.MiniParse";
             var sortKey = "encdps";
             var sortType = "NumericDescending";
@@ -186,6 +186,12 @@
                 },
                 "receive": function (json) {
                     update(json);
+                    if (json.processingTime) {
+                        $("#debug").show();
+                        $("#debug").text(json.processingTime);
+                    } else {
+                        $("#debug").hide();
+                    }
                 },
                 "error": function (message) {
                     console.log("error: " + message);
@@ -370,6 +376,8 @@
         <!-- ここにヘッダが入る -->
         <!-- ここに各キャラの情報が入る -->
     </table>
+
+    <div id="debug"></div>
 
 </body>
 </html>

@@ -15,14 +15,16 @@ namespace RainbowMage.ActServer
         private CancellationTokenSource cancellationTokenSource;
         private bool running = false;
         private int port;
+        private string serviceName;
         private Queue<MessageEntry> messageQueue;
         private ulong latestMessageTimestamp;
 
         public List<IExtension> Extensions { get; set; }
 
-        public Server(int port)
+        public Server(int port, string serviceName)
         {
             this.port = port;
+            this.serviceName = serviceName;
             this.messageQueue = new Queue<MessageEntry>();
             this.Extensions = new List<IExtension>();
         }
@@ -38,7 +40,12 @@ namespace RainbowMage.ActServer
             this.cancellationTokenSource = new CancellationTokenSource();
 
             this.listener = new HttpListener();
-            this.listener.Prefixes.Add(string.Format("http://+:{0}/", port));
+            var prefixFormat = "http://+:{0}/{1}/";
+            if (serviceName.Trim() == string.Empty)
+            {
+                prefixFormat = "http://+:{0}/";
+            }
+            this.listener.Prefixes.Add(string.Format(prefixFormat, port, serviceName));
             this.listener.Start();
 
             var token = cancellationTokenSource.Token;
@@ -63,7 +70,11 @@ namespace RainbowMage.ActServer
                     Console.WriteLine("[{0}] Receive: {1}", context.Request.RequestTraceIdentifier, context.Request.RawUrl);
 
                     var actionName = context.Request.QueryString.Get("action");
-                    if (actionName == "requestData")
+                    if (actionName == string.Empty)
+                    {
+                        SendErrorResponse(context, "Action name is not specified.", actionName);
+                    } 
+                    else if (actionName == "requestData")
                     {
                         OnRequestData(context);
                     }
@@ -118,7 +129,8 @@ namespace RainbowMage.ActServer
                     if (this.latestMessageTimestamp > timestamp)
                     {
                         var message = messageQueue.FirstOrDefault(
-                            x => x.Timestamp > timestamp && (x.IsBroadcast || x.To == clientName));
+                            x => x.Timestamp > timestamp 
+                                 && (x.IsBroadcast || x.To == clientName));
                         if (message != null)
                         {
                             SendJsonResponse(context, message.GetJson());
@@ -195,13 +207,11 @@ namespace RainbowMage.ActServer
             writer.Write(json);
             writer.Flush();
             context.Response.Close();
-
-            Console.WriteLine("[{0}] Send: {1}", context.Request.RequestTraceIdentifier, json.Substring(0, Math.Min(json.Length, 100)));
         }
 
         public static void SendDefaultResponse(HttpListenerContext context)
         {
-            SendJsonResponse(context, "{ \"isError\": false }");
+            SendJsonResponse(context, "{}");
         }
 
         public static void SendErrorResponse(HttpListenerContext context, string format, params object[] args)

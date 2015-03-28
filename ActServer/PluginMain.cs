@@ -1,10 +1,8 @@
 ﻿using Advanced_Combat_Tracker;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace RainbowMage.ActServer
 {
@@ -16,11 +14,10 @@ namespace RainbowMage.ActServer
         {
             ServicePointManager.DefaultConnectionLimit = 10;
 
-            var miniParseExtension = new Extensions.MiniParseExtension();
+            var builtinExtensions = LoadExtensionsFromAssembly(Assembly.GetExecutingAssembly());
 
-            this.server = new Server(23456);
-            this.server.Extensions.AddRange(GetBuiltInExtensions());
-            this.server.Extensions.AddRange(LoadExtensions());
+            this.server = new Server(23456, "actserver");
+            this.server.Extensions.AddRange(builtinExtensions);
             this.server.Start();
         }
 
@@ -38,7 +35,29 @@ namespace RainbowMage.ActServer
         {
             var result = new List<IExtension>();
 
+
+
             return result;
+        }
+
+        private IEnumerable<IExtension> LoadExtensionsFromAssembly(Assembly assembly)
+        {
+            var types = assembly.GetExportedTypes();
+            var extensions = types.Where(t => t.GetInterface(typeof(IExtension).FullName) != null);
+            foreach (var extension in extensions)
+            {
+                if (extension != typeof(ExtensionWrapper))
+                {
+                    if (extension.IsClass && !extension.IsAbstract && !extension.IsInterface)
+                    {
+                        var obj = assembly.CreateInstance(extension.FullName);
+                        if (obj != null)
+                        {
+                            yield return new ExtensionWrapper(obj);
+                        }
+                    }
+                }
+            }
         }
 
         public IEnumerable<IExtension> GetBuiltInExtensions()

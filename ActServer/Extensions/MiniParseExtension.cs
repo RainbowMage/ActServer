@@ -1,11 +1,10 @@
 ﻿using Advanced_Combat_Tracker;
+using RainbowMage.ActServer.Collections;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,14 +44,34 @@ namespace RainbowMage.ActServer.Extensions
             var sortTypeString = context.Request.QueryString.Get("sortType");
             Enum.TryParse(sortTypeString, true, out sortType);
 
-            Server.SendJsonResponse(context, CreateJsonData(sortKey, sortType, token));
+            while (!token.IsCancellationRequested && !CheckIsActReady())
+            {
+                Thread.Sleep(100);
+            }
+            if (!CheckIsActReady())
+            {
+                Server.SendErrorResponse(context, "Server stopped.");
+            }
+
+            var json = "";
+            try
+            {
+                json = CreateJsonData(sortKey, sortType, token);
+            }
+            catch (Exception e)
+            {
+                Server.SendErrorResponse(context, e.ToString());
+                return;
+            }
+
+            Server.SendJsonResponse(context, json);
         }
-        #endregion
 
         public void Dispose()
         {
 
         }
+        #endregion
 
         private static string updateStringCache = "";
         private static DateTime updateStringCacheLastUpdate;
@@ -65,16 +84,6 @@ namespace RainbowMage.ActServer.Extensions
                 return updateStringCache;
             }
 
-            while (!token.IsCancellationRequested && !CheckIsActReady())
-            {
-                Thread.Sleep(100);
-            }
-
-            if (!CheckIsActReady())
-            {
-                return "{ \"_error\": \"Server stopped.\" }";
-            }
-
 #if DEBUG
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -82,7 +91,7 @@ namespace RainbowMage.ActServer.Extensions
 
             var allies = ActGlobals.oFormActMain.ActiveZone.ActiveEncounter.GetAllies();
             Dictionary<string, string> encounter = null;
-            List<KeyValuePair<CombatantData, Dictionary<string, string>>> combatant = null;
+            OrderedDictionary<string, Dictionary<string, string>> combatant = null;
 
             var encounterTask = Task.Run(() =>
             {
@@ -95,63 +104,17 @@ namespace RainbowMage.ActServer.Extensions
             });
             Task.WaitAll(encounterTask, combatantTask);
 
-            var builder = new StringBuilder();
-            builder.Append("{");
-            builder.Append("\"Encounter\": {");
-            var isFirst1 = true;
-            foreach (var pair in encounter)
-            {
-                if (isFirst1)
-                {
-                    isFirst1 = false;
-                }
-                else
-                {
-                    builder.Append(",");
-                }
-                var valueString = Util.CreateJsonSafeString(Util.ReplaceNaNString(pair.Value, "---"));
-                builder.AppendFormat("\"{0}\":\"{1}\"", Util.CreateJsonSafeString(pair.Key), valueString);
-            }
-            builder.Append("},");
-            builder.Append("\"Combatant\": {");
-            var isFirst2 = true;
-            foreach (var pair in combatant)
-            {
-                if (isFirst2)
-                {
-                    isFirst2 = false;
-                }
-                else
-                {
-                    builder.Append(",");
-                }
-                builder.AppendFormat("\"{0}\": {{", Util.CreateJsonSafeString(pair.Key.Name));
-                var isFirst3 = true;
-                foreach (var pair2 in pair.Value)
-                {
-                    if (isFirst3)
-                    {
-                        isFirst3 = false;
-                    }
-                    else
-                    {
-                        builder.Append(",");
-                    }
-                    var valueString = Util.CreateJsonSafeString(Util.ReplaceNaNString(pair2.Value, "---"));
-                    builder.AppendFormat("\"{0}\":\"{1}\"", Util.CreateJsonSafeString(pair2.Key), valueString);
-                }
-                builder.Append("}");
-            }
-            builder.Append("},");
-            builder.AppendFormat("\"isActive\": {0}", ActGlobals.oFormActMain.ActiveZone.ActiveEncounter.Active ? "true" : "false");
-            builder.Append("}");
+            var response = new MiniParseResponse();
+            response.Encounter = encounter;
+            response.Combatant = combatant;
+            response.IsActive = ActGlobals.oFormActMain.ActiveZone.ActiveEncounter.Active;
 
 #if DEBUG
             stopwatch.Stop();
-            //Log(LogLevel.Trace, "CreateUpdateScript: {0} msec", stopwatch.Elapsed.TotalMilliseconds);
+            response.ProcessingTime = stopwatch.Elapsed.TotalMilliseconds;
 #endif
 
-            var result = builder.ToString();
+            var result = response.GetJson();
 
             updateStringCache = result;
             updateStringCacheLastUpdate = DateTime.Now;
@@ -159,7 +122,10 @@ namespace RainbowMage.ActServer.Extensions
             return result;
         }
 
-        private void SortCombatantList(List<KeyValuePair<CombatantData, Dictionary<string, string>>> combatant, string sortKey, SortType sortType)
+        private void SortCombatantList(
+            OrderedDictionary<string, Dictionary<string, string>> combatant, 
+            string sortKey,
+            SortType sortType)
         {
             // 数値で並び替え
             if (sortType == SortType.NumericAscending ||
@@ -210,14 +176,9 @@ namespace RainbowMage.ActServer.Extensions
             }
         }
 
-        private List<KeyValuePair<CombatantData, Dictionary<string, string>>> GetCombatantList(List<CombatantData> allies)
+        private OrderedDictionary<string, Dictionary<string, string>> GetCombatantList(List<CombatantData> allies)
         {
-#if DEBUG
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-#endif
-
-            var combatantList = new List<KeyValuePair<CombatantData, Dictionary<string, string>>>();
+            var combatantList = new OrderedDictionary<string, Dictionary<string, string>>();
             Parallel.ForEach(allies, (ally) =>
             //foreach (var ally in allies)
             {
@@ -259,26 +220,16 @@ namespace RainbowMage.ActServer.Extensions
 
                 lock (combatantList)
                 {
-                    combatantList.Add(new KeyValuePair<CombatantData, Dictionary<string, string>>(ally, valueDict));
+                    combatantList.Add(ally.Name, valueDict);
                 }
             }
             );
-
-#if DEBUG
-            stopwatch.Stop();
-            //Log(LogLevel.Trace, "GetCombatantList: {0} msec", stopwatch.Elapsed.TotalMilliseconds);
-#endif
 
             return combatantList;
         }
 
         private Dictionary<string, string> GetEncounterDictionary(List<CombatantData> allies)
         {
-#if DEBUG
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-#endif
-
             var encounterDict = new Dictionary<string, string>();
             //Parallel.ForEach(EncounterData.ExportVariables, (exportValuePair) =>
             foreach (var exportValuePair in EncounterData.ExportVariables)
@@ -314,11 +265,6 @@ namespace RainbowMage.ActServer.Extensions
                 }
             }
             //);
-
-#if DEBUG
-            stopwatch.Stop();
-            //Log(LogLevel.Trace, "GetEncounterDictionary: {0} msec", stopwatch.Elapsed.TotalMilliseconds);
-#endif
 
             return encounterDict;
         }

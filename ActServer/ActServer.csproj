@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventArgs.cs" />
+    <Compile Include="Extensions\MiniParseResponse.cs" />
+    <Compile Include="Collections\OrderedDictionary.cs" />
+    <Compile Include="ExtensionWrapper.cs" />
     <Compile Include="Extensions\MiniParseExtension.cs" />
     <Compile Include="IExtension.cs" />
     <Compile Include="MessageEntry.cs" />

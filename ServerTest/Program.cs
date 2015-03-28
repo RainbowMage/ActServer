@@ -16,7 +16,7 @@ namespace ServerTest
 
             var miniparse = new RainbowMage.ActServer.Extensions.MiniParseExtension();
 
-            Server server = new Server(23456);
+            Server server = new Server(23456, "actserver");
             //server.Extensions.Add(miniparse);
             server.Start();
 
