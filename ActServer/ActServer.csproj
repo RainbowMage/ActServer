@@ -55,6 +55,7 @@
     <Compile Include="MessageEntry.cs" />
     <Compile Include="PluginMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reflection.Helper\ReflectionHelper.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>

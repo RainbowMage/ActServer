@@ -2,6 +2,10 @@
 using System.Linq;
 using System.Net;
 using System.Threading;
+using RainbowMage.ActServer.Reflection.Helper;
+using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace RainbowMage.ActServer
 {
@@ -10,11 +14,28 @@ namespace RainbowMage.ActServer
     /// </summary>
     public class ExtensionWrapper : IExtension
     {
-        private object extensionObject;
+        static readonly PropertyInfo ExtensionNamePropertyInfo;
+        static readonly PropertyInfo DisplayNamePropertyInfo;
+        static readonly PropertyInfo DescriptionPropertyInfo;
+        static readonly MethodInfo ProcessRequestMethodInfo;
+        static readonly MethodInfo DisposeMethodInfo;
+
+        static ExtensionWrapper()
+        {
+#pragma warning disable 1720
+            ExtensionNamePropertyInfo = Property.Of<string>(() => default(IExtension).ExtensionName);
+            DisplayNamePropertyInfo = Property.Of<string>(() => default(IExtension).DisplayName);
+            DescriptionPropertyInfo = Property.Of<string>(() => default(IExtension).Description);
+            ProcessRequestMethodInfo = Method.Of(() => default(IExtension).ProcessRequest(default(HttpListenerContext), default(CancellationToken)));
+            DisposeMethodInfo = Method.Of(() => default(IExtension).Dispose());
+#pragma warning restore 1720
+        }
+
+        private object obj;
 
         public ExtensionWrapper(object extensionObject)
         {
-            this.extensionObject = extensionObject;
+            this.obj = extensionObject;
         }
 
         #region IExtension
@@ -22,7 +43,7 @@ namespace RainbowMage.ActServer
         {
             get
             {
-                return GetPropertyValue<string>(extensionObject, "ExtensionName");
+                return (string)ExtensionNamePropertyInfo.GetValue(obj);
             }
         }
 
@@ -30,7 +51,7 @@ namespace RainbowMage.ActServer
         {
             get
             {
-                return GetPropertyValue<string>(extensionObject, "DisplayName");
+                return (string)DisplayNamePropertyInfo.GetValue(obj);
             }
         }
 
@@ -38,60 +59,19 @@ namespace RainbowMage.ActServer
         {
             get
             {
-                return GetPropertyValue<string>(extensionObject, "Description");
+                return (string)DescriptionPropertyInfo.GetValue(obj);
             }
         }
 
         public void ProcessRequest(HttpListenerContext context, CancellationToken token)
         {
-            InvokeMethod(extensionObject, "ProcessRequest", context, token);
+            ProcessRequestMethodInfo.Invoke(obj, new object[] { context, token });
         }
 
         public void Dispose()
         {
-            InvokeMethod(extensionObject, "Dispose");
+            DisposeMethodInfo.Invoke(obj, new object[0]);
         }
         #endregion
-
-        private static T GetPropertyValue<T>(object obj, string propertyName)
-        {
-            var prop = obj.GetType().GetProperty(propertyName);
-            if (prop != null && prop.PropertyType == typeof(T))
-            {
-                return (T)prop.GetValue(obj);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private static void InvokeMethod(object obj, string methodName, params object[] args)
-        {
-            var argTypes = args.Select((x) => x.GetType()).ToArray();
-            var method = obj.GetType().GetMethod(methodName, argTypes);
-            if (method != null && method.ReturnType == typeof(void))
-            {
-                method.Invoke(obj, args);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        private static T InvokeMethod<T>(object obj, string methodName, params object[] args)
-        {
-            var argTypes = args.Select((x) => x.GetType()).ToArray();
-            var method = obj.GetType().GetMethod(methodName, argTypes);
-            if (method != null && method.ReturnType == typeof(T))
-            {
-                return (T)method.Invoke(obj, args);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
     }
 }
