@@ -1,8 +1,10 @@
 ﻿using Advanced_Combat_Tracker;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace RainbowMage.ActServer
 {
@@ -14,10 +16,10 @@ namespace RainbowMage.ActServer
         {
             ServicePointManager.DefaultConnectionLimit = 10;
 
-            var builtinExtensions = LoadExtensionsFromAssembly(Assembly.GetExecutingAssembly());
+            var extensions = LoadExtensions();
 
             this.server = new Server(23456, "actserver");
-            this.server.Extensions.AddRange(builtinExtensions);
+            this.server.Extensions.AddRange(extensions);
             this.server.Start();
         }
 
@@ -35,9 +37,39 @@ namespace RainbowMage.ActServer
         {
             var result = new List<IExtension>();
 
+            foreach (var file in System.IO.Directory.GetFiles(GetPluginDirectory(), "*.dll"))
+            {
+                var assembly = Assembly.LoadFrom(file);
+                var extensions = LoadExtensionsFromAssembly(assembly);
+                foreach (var extension in extensions)
+                {
+                    Console.WriteLine("Plugin: {0} ({1})", extension.DisplayName, extension.ExtensionName);
+                    yield return extension;
+                }
+            }
+        }
 
+        private static Assembly LoadAssembly(string asmPath)
+        {
+            if (System.IO.File.Exists(asmPath))
+            {
+                var pdbPath = System.IO.Path.Combine(
+                    System.IO.Path.GetDirectoryName(asmPath),
+                    System.IO.Path.GetFileNameWithoutExtension(asmPath) + ".pdb");
 
-            return result;
+                byte[] asmData = System.IO.File.ReadAllBytes(asmPath);
+                byte[] pdbData = null;
+                if (System.IO.File.Exists(pdbPath))
+                {
+                    pdbData = System.IO.File.ReadAllBytes(pdbPath);
+                }
+
+                return AppDomain.CurrentDomain.Load(asmData, pdbData);
+            }
+            else
+            {
+                throw new System.IO.FileNotFoundException();
+            }
         }
 
         private IEnumerable<IExtension> LoadExtensionsFromAssembly(Assembly assembly)
@@ -46,7 +78,7 @@ namespace RainbowMage.ActServer
             var extensions = types.Where(t => t.GetInterface(typeof(IExtension).FullName) != null);
             foreach (var extension in extensions)
             {
-                if (extension != typeof(ExtensionWrapper))
+                if (extension.FullName != typeof(ExtensionWrapper).FullName)
                 {
                     if (extension.IsClass && !extension.IsAbstract && !extension.IsInterface)
                     {
@@ -67,6 +99,26 @@ namespace RainbowMage.ActServer
             result.Add(new Extensions.MiniParseExtension());
 
             return result;
+        }
+
+        private string GetPluginDirectory()
+        {
+            if (ActGlobals.oFormActMain != null)
+            {
+                var plugin = ActGlobals.oFormActMain.ActPlugins.Where(x => x.pluginObj == this).FirstOrDefault();
+                if (plugin != null)
+                {
+                    return System.IO.Path.GetDirectoryName(plugin.pluginFile.FullName);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            else
+            {
+                return Application.StartupPath;
+            }
         }
     }
 }

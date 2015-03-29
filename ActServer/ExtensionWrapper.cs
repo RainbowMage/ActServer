@@ -14,20 +14,20 @@ namespace RainbowMage.ActServer
     /// </summary>
     public class ExtensionWrapper : IExtension
     {
-        static readonly PropertyInfo ExtensionNamePropertyInfo;
-        static readonly PropertyInfo DisplayNamePropertyInfo;
-        static readonly PropertyInfo DescriptionPropertyInfo;
-        static readonly MethodInfo ProcessRequestMethodInfo;
-        static readonly MethodInfo DisposeMethodInfo;
+        static readonly string ExtensionNamePropertyName;
+        static readonly string DisplayNamePropertyName;
+        static readonly string DescriptionPropertyName;
+        static readonly string ProcessRequestMethodName;
+        static readonly string DisposeMethodName;
 
         static ExtensionWrapper()
         {
 #pragma warning disable 1720
-            ExtensionNamePropertyInfo = Property.Of<string>(() => default(IExtension).ExtensionName);
-            DisplayNamePropertyInfo = Property.Of<string>(() => default(IExtension).DisplayName);
-            DescriptionPropertyInfo = Property.Of<string>(() => default(IExtension).Description);
-            ProcessRequestMethodInfo = Method.Of(() => default(IExtension).ProcessRequest(default(HttpListenerContext), default(CancellationToken)));
-            DisposeMethodInfo = Method.Of(() => default(IExtension).Dispose());
+            ExtensionNamePropertyName = Property.Of<string>(() => default(IExtension).ExtensionName).Name;
+            DisplayNamePropertyName = Property.Of<string>(() => default(IExtension).DisplayName).Name;
+            DescriptionPropertyName = Property.Of<string>(() => default(IExtension).Description).Name;
+            ProcessRequestMethodName = Method.Of(() => default(IExtension).ProcessRequest(default(HttpListenerContext), default(CancellationToken))).Name;
+            DisposeMethodName = Method.Of(() => default(IExtension).Dispose()).Name;
 #pragma warning restore 1720
         }
 
@@ -43,7 +43,7 @@ namespace RainbowMage.ActServer
         {
             get
             {
-                return (string)ExtensionNamePropertyInfo.GetValue(obj);
+                return obj.GetProperty<string>(ExtensionNamePropertyName);
             }
         }
 
@@ -51,7 +51,7 @@ namespace RainbowMage.ActServer
         {
             get
             {
-                return (string)DisplayNamePropertyInfo.GetValue(obj);
+                return obj.GetProperty<string>(DisplayNamePropertyName);
             }
         }
 
@@ -59,18 +59,21 @@ namespace RainbowMage.ActServer
         {
             get
             {
-                return (string)DescriptionPropertyInfo.GetValue(obj);
+                return obj.GetProperty<string>(DescriptionPropertyName);
             }
         }
 
         public void ProcessRequest(HttpListenerContext context, CancellationToken token)
         {
-            ProcessRequestMethodInfo.Invoke(obj, new object[] { context, token });
+            obj.InvokeMethod(
+                ProcessRequestMethodName, 
+                new Type[] { typeof(HttpListenerContext), typeof(CancellationToken) },
+                new object[] { context, token });
         }
 
         public void Dispose()
         {
-            DisposeMethodInfo.Invoke(obj, new object[0]);
+            obj.InvokeMethod(DisposeMethodName, new Type[0], new object[0]);
         }
         #endregion
     }
