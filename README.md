@@ -1,6 +1,6 @@
 # ActServer
 
-ACT plugin to serve JSON formatted data using HttpListener.
+ACT plugin to serve JSON formatted data using [Nancy](http://nancyfx.org/).
 
 Combination of this plugin and OBS CLR Browser Source Plugin would be nice.
 
