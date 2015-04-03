@@ -53,10 +53,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="MainModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ActServer.Nancy\ActServer.Nancy.csproj">
+      <Project>{3bca493c-0719-4a7b-a754-076b6588b4a0}</Project>
+      <Name>ActServer.Nancy</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\ActServer\ActServer.csproj">
       <Project>{1a96aa61-10a9-4526-9144-c521140f400b}</Project>
       <Name>ActServer</Name>

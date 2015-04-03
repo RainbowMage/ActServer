@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Nancy;
 
-namespace RainbowMage.ActServer
+namespace RainbowMage.ActServer.Nancy
 {
     public static class NancyResponseHelper
     {

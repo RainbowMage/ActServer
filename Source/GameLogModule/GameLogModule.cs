@@ -2,15 +2,15 @@
 using Advanced_Combat_Tracker;
 using RainbowMage.ActServer.Nancy;
 using Nancy;
-using RainbowMage.ActServer;
+using RainbowMage.ActServer.Nancy;
 
 namespace GameLogModule
 {
     public class GameLogModule : NancyModule
     {
-        public GameLogModule(IConfiguration configuration)
+        public GameLogModule(IBootstrapParams bootParams)
         {
-            if (!configuration.IsWebSocketAvailable())
+            if (!bootParams.IsWebSocketAvailable())
             {
                 return;
             }

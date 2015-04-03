@@ -1,5 +1,6 @@
 ﻿using Advanced_Combat_Tracker;
 using Nancy;
+using RainbowMage.ActServer.Nancy;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

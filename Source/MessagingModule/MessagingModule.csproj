@@ -47,14 +47,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="MessagingModule.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ActServer.Common\ActServer.Common.csproj">
-      <Project>{d4250387-8435-40f7-8cad-c0397e3cbf62}</Project>
-      <Name>ActServer.Common</Name>
+    <ProjectReference Include="..\ActServer.Nancy\ActServer.Nancy.csproj">
+      <Project>{3bca493c-0719-4a7b-a754-076b6588b4a0}</Project>
+      <Name>ActServer.Nancy</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\ActServer\ActServer.csproj">

@@ -24,7 +24,7 @@ namespace MessagingModule
             messageQueue = new Queue<Message>();
         }
 
-        public MessagingModule(IConfiguration configuration)
+        public MessagingModule(IBootstrapParams bootParams)
         {
             this.After += context =>
             {
@@ -34,7 +34,7 @@ namespace MessagingModule
                 }
             };
 
-            if (configuration.IsWebSocketAvailable())
+            if (bootParams.IsWebSocketAvailable())
             {
                 Get["/websocket/message"] = _ =>
                 {

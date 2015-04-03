@@ -5,12 +5,13 @@ using System.Reflection;
 using System.Threading;
 using Nancy;
 using Nancy.Routing;
+using RainbowMage.ActServer.Nancy;
 
 namespace RainbowMage.ActServer.Modules
 {
     public class MainModule : NancyModule
     {
-        public MainModule(IRouteCacheProvider route)
+        public MainModule(IBootstrapParams bootParams, IRouteCacheProvider route)
         {
             this.After += context =>
             {
@@ -37,6 +38,8 @@ namespace RainbowMage.ActServer.Modules
                     Name = asm.GetName().Name,
                     Version = asm.GetName().Version.ToString(),
                     Copyright = GetAssemblyCopyright(asm),
+                    RootDirectory = bootParams.RootDirectory,
+                    HostType = bootParams.HostType.ToString(),
                     Modules = modules
                 });
             };

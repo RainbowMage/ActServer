@@ -36,7 +36,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogModule", "GameLogMod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingModule", "MessagingModule\MessagingModule.csproj", "{074807AB-BF87-40E6-AC40-52CD16F7ED28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActServer.Common", "ActServer.Common\ActServer.Common.csproj", "{D4250387-8435-40F7-8CAD-C0397E3CBF62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActServer.Nancy", "ActServer.Nancy\ActServer.Nancy.csproj", "{3BCA493C-0719-4A7B-A754-076B6588B4A0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{D8A5D37F-1FA8-47CB-90D6-9A684BFB58E7}"
+	ProjectSection(SolutionItems) = preProject
+		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,10 +72,10 @@ Global
 		{074807AB-BF87-40E6-AC40-52CD16F7ED28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{074807AB-BF87-40E6-AC40-52CD16F7ED28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{074807AB-BF87-40E6-AC40-52CD16F7ED28}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BCA493C-0719-4A7B-A754-076B6588B4A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BCA493C-0719-4A7B-A754-076B6588B4A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BCA493C-0719-4A7B-A754-076B6588B4A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BCA493C-0719-4A7B-A754-076B6588B4A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

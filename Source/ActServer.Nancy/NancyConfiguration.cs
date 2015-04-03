@@ -4,23 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RainbowMage.ActServer
+namespace RainbowMage.ActServer.Nancy
 {
-    public interface IConfiguration
+    public interface IBootstrapParams
     {
+        string RootDirectory { get; }
         HostType HostType { get; }
     }
 
-    public class Configuration : IConfiguration
+    public class BootstrapParams : IBootstrapParams
     {
+        public string RootDirectory { get; set; }
         public HostType HostType { get; set; }
     }
 
     public static class ConfigurationExtension
     {
-        public static bool IsWebSocketAvailable(this IConfiguration config)
+        public static bool IsWebSocketAvailable(this IBootstrapParams info)
         {
-            if (config.HostType == HostType.OwinSelfHost)
+            if (info.HostType == HostType.OwinSelfHost)
             {
                 return true;
             }

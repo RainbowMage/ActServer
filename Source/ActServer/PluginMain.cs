@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using Advanced_Combat_Tracker;
 using Microsoft.Owin.Hosting;
 using Nancy.Hosting.Self;
+using Nancy.Owin;
+using Owin;
 using RainbowMage.ActServer.Nancy;
 
 namespace RainbowMage.ActServer
@@ -20,6 +22,7 @@ namespace RainbowMage.ActServer
         AssemblyResolver resolver;
         ManualResetEvent initCompleteEvent;
         IDisposable owinHost;
+        NancyHost nancyHost;
 
         public PluginMain()
         {
@@ -48,6 +51,7 @@ namespace RainbowMage.ActServer
             if (initCompleteEvent.WaitOne())
             {
                 if (owinHost != null) owinHost.Dispose();
+                if (nancyHost != null) nancyHost.Dispose();
                 if (resolver != null) resolver.Dispose();
             }
         }
@@ -99,7 +103,20 @@ namespace RainbowMage.ActServer
         {
             try
             {
-                owinHost = WebApp.Start<OwinStartup>(baseUri);
+                owinHost = WebApp.Start(baseUri, app =>
+                {
+                    var configuration = new BootstrapParams()
+                    {
+                        RootDirectory = GetPluginDirectory(),
+                        HostType = HostType.OwinSelfHost
+                    };
+                    var nancyOptions = new NancyOptions()
+                    {
+                        Bootstrapper = new Bootstrapper(configuration)
+                    };
+
+                    app.UseNancy(nancyOptions);
+                });
 
                 return true;
             }
@@ -107,7 +124,7 @@ namespace RainbowMage.ActServer
             {
                 if (e.InnerException is HttpListenerException)
                 {
-                    if (((HttpListenerException) e.InnerException).ErrorCode == 5) // Access denied
+                    if (((HttpListenerException)e.InnerException).ErrorCode == 5) // Access denied
                     {
                         return false;
                     }
@@ -119,12 +136,13 @@ namespace RainbowMage.ActServer
 
         private void StartupNancySelfHost(string baseUri)
         {
-            var configuration = new Configuration()
+            var configuration = new BootstrapParams()
             {
+                RootDirectory = GetPluginDirectory(),
                 HostType = HostType.NancySelfHost
             };
 
-            var host = new NancyHost(
+            nancyHost = new NancyHost(
                 new Uri(baseUri),
                 new Bootstrapper(configuration),
                 new HostConfiguration()
@@ -132,7 +150,7 @@ namespace RainbowMage.ActServer
                     UrlReservations = new global::Nancy.Hosting.Self.UrlReservations() { CreateAutomatically = true },
                 });
 
-            host.Start();
+            nancyHost.Start();
         }
 
         public void LoadModules()
