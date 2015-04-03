@@ -31,6 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowedReferenceRelatedFileExtensions>.exe.config;.dll.config</AllowedReferenceRelatedFileExtensions>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Advanced Combat Tracker, Version=3.1.5.246, Culture=neutral, PublicKeyToken=a946b61e93d97868, processorArchitecture=x86">

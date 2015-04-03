@@ -6,15 +6,15 @@
      * @param message {String} [Required] Message to unicast.
      * @returns {XMLHttpRequest}
      */
-    sendMessage: function (server, to, message) {
+    sendMessage: function (server, to, body) {
         if (!server) {
-            throw "'server' is undefined."
+            throw "'server' is undefined.";
         }
         if (!to) {
-            throw "'to' is undefined."
+            throw "'to' is undefined.";
         }
-        if (!message) {
-            throw "'message' is undefined."
+        if (!body) {
+            throw "'body' is undefined.";
         }
         if (server.charAt(server.length - 1) != "/") {
             server += "/";
@@ -23,9 +23,9 @@
             "action": "sendMessage",
             "from": "sender",
             "to": to,
-            "message": message
+            "body": body
         };
-        return $.getJSON(server + "message/send", query, function (json) {
+        return $.getJSON(server + "command/message/send", query, function (json) {
             if (json.isError) {
                 console.log(json.message);
             }
@@ -37,12 +37,12 @@
      * @param message {String} [Required] Message to broadcast.
      * @returns {XMLHttpRequest}
      */
-    broadcastMessage: function (server, message) {
+    broadcastMessage: function (server, body) {
         if (!server) {
-            throw "'server' is undefined."
+            throw "'server' is undefined.";
         }
-        if (!message) {
-            throw "'message' is undefined."
+        if (!body) {
+            throw "'body' is undefined.";
         }
         if (server.charAt(server.length - 1) != "/") {
             server += "/";
@@ -50,9 +50,9 @@
         var query = {
             "action": "broadcastMessage",
             "from": "sender",
-            "message": message
+            "body": body
         };
-        return $.getJSON(server + "message/send", query, function (json) {
+        return $.getJSON(server + "command/message/send", query, function (json) {
             if (json.isError) {
                 console.log(json.message);
             }
@@ -81,13 +81,13 @@
 
     _pollMessage: function(param, controller) {
         if (!param) {
-            throw "'param' is undefined."
+            throw "'param' is undefined.";
         }
         if (!param.server) {
             throw "'server' is not specified.";
         }
         if (!param.name) {
-            throw "'name' is not specified."
+            throw "'name' is not specified.";
         }
 
         if (param.server.charAt(param.server.length - 1) != "/") {
@@ -98,7 +98,7 @@
             var _this = this;
             $.ajax({
                 dataType: "json",
-                url: param.server + "message/receive",
+                url: param.server + "command/message/receive",
                 data: {
                     "action": "requestMessage",
                     "name": param.name,
@@ -156,13 +156,13 @@
         if (!controller._stopped) {
 
             if (!param) {
-                throw "'param' is undefined."
+                throw "'param' is undefined.";
             }
             if (!param.server) {
                 throw "'server' is not specified.";
             }
             if (!param.module) {
-                throw "'module' is not specified."
+                throw "'module' is not specified.";
             }
             
             var data = {
@@ -180,7 +180,7 @@
             var _this = this;
             $.ajax({
                 dataType: "json",
-                url: param.server + param.module,
+                url: param.server + "command/" + param.module,
                 timeout: param.timeout ? param.timeout : 60000,
                 "data": data,
                 success: function (json) {

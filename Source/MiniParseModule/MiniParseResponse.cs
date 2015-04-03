@@ -12,7 +12,7 @@ namespace RainbowMage.ActServer.Modules
     [DataContract]
     class MiniParseResponse
     {
-        private static readonly DataContractJsonSerializer jsonSerializer =
+        private static readonly DataContractJsonSerializer JsonSerializer =
                new DataContractJsonSerializer(typeof(MiniParseResponse), new DataContractJsonSerializerSettings()
                {
                    UseSimpleDictionaryFormat = true
@@ -34,7 +34,7 @@ namespace RainbowMage.ActServer.Modules
         {
             using (var stream = new MemoryStream())
             {
-                jsonSerializer.WriteObject(stream, this);
+                JsonSerializer.WriteObject(stream, this);
                 return Encoding.UTF8.GetString(stream.ToArray());
             }
         }

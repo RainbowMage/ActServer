@@ -31,7 +31,7 @@ namespace RainbowMage.ActServer.Modules
                 }
             };
 
-            Get["/miniparse"] = _ =>
+            Get["/command/miniparse"] = _ =>
             {
                 string sortKey = Request.Query.sortKey;
                 SortType sortType;
@@ -63,11 +63,11 @@ namespace RainbowMage.ActServer.Modules
 
         private static string updateStringCache = "";
         private static DateTime updateStringCacheLastUpdate;
-        private static readonly TimeSpan updateStringCacheExpireInterval = new TimeSpan(0, 0, 0, 0, 500); // 500 msec
+        private static readonly TimeSpan UpdateStringCacheExpireInterval = new TimeSpan(0, 0, 0, 0, 500); // 500 msec
 
         internal string CreateJsonData(string sortKey, SortType sortType)
         {
-            if (DateTime.Now - updateStringCacheLastUpdate < updateStringCacheExpireInterval)
+            if (DateTime.Now - updateStringCacheLastUpdate < UpdateStringCacheExpireInterval)
             {
                 return updateStringCache;
             }
@@ -199,7 +199,7 @@ namespace RainbowMage.ActServer.Modules
                         var value = exportValuePair.Value.GetExportString(ally, "");
                         valueDict.Add(exportValuePair.Key, value);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         //Log(LogLevel.Error, "GetCombatantList: {0}: {1}: {2}", ally.Name, exportValuePair.Key, e);
                         continue;
@@ -247,7 +247,7 @@ namespace RainbowMage.ActServer.Modules
                     encounterDict.Add(exportValuePair.Key, value);
                     //}
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     //Log(LogLevel.Error, "GetEncounterDictionary: {0}: {1}", exportValuePair.Key, e);
                 }

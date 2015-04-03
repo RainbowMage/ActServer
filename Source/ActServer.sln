@@ -8,6 +8,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{90F36088-1D2D-43FD-8AED-0B88053C7158}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1A96AA61-10A9-4526-9144-C521140F400B} = {1A96AA61-10A9-4526-9144-C521140F400B}
+		{4EDF5462-F478-4A96-B567-DE0C7ED52230} = {4EDF5462-F478-4A96-B567-DE0C7ED52230}
+		{EAEB8E87-CBAA-4F4F-838C-40CF2236C6F5} = {EAEB8E87-CBAA-4F4F-838C-40CF2236C6F5}
+		{B78EA490-142B-44A2-8F34-CF5B76B04ACE} = {B78EA490-142B-44A2-8F34-CF5B76B04ACE}
+		{074807AB-BF87-40E6-AC40-52CD16F7ED28} = {074807AB-BF87-40E6-AC40-52CD16F7ED28}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainModule", "MainModule\MainModule.csproj", "{EAEB8E87-CBAA-4F4F-838C-40CF2236C6F5}"
@@ -18,7 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{98B857
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{EA9222A2-EA10-4802-96DE-F0261BB7635A}"
@@ -28,6 +31,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{EA9222A2
 		..\LICENSE.txt = ..\LICENSE.txt
 		..\README.md = ..\README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogModule", "GameLogModule\GameLogModule.csproj", "{4EDF5462-F478-4A96-B567-DE0C7ED52230}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingModule", "MessagingModule\MessagingModule.csproj", "{074807AB-BF87-40E6-AC40-52CD16F7ED28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActServer.Common", "ActServer.Common\ActServer.Common.csproj", "{D4250387-8435-40F7-8CAD-C0397E3CBF62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +59,18 @@ Global
 		{B78EA490-142B-44A2-8F34-CF5B76B04ACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B78EA490-142B-44A2-8F34-CF5B76B04ACE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B78EA490-142B-44A2-8F34-CF5B76B04ACE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EDF5462-F478-4A96-B567-DE0C7ED52230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EDF5462-F478-4A96-B567-DE0C7ED52230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EDF5462-F478-4A96-B567-DE0C7ED52230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EDF5462-F478-4A96-B567-DE0C7ED52230}.Release|Any CPU.Build.0 = Release|Any CPU
+		{074807AB-BF87-40E6-AC40-52CD16F7ED28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{074807AB-BF87-40E6-AC40-52CD16F7ED28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{074807AB-BF87-40E6-AC40-52CD16F7ED28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{074807AB-BF87-40E6-AC40-52CD16F7ED28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4250387-8435-40F7-8CAD-C0397E3CBF62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

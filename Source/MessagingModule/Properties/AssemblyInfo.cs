@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("MiniParseModule")]
+[assembly: AssemblyTitle("MessagingModule")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MiniParseModule")]
+[assembly: AssemblyProduct("MessagingModule")]
 [assembly: AssemblyCopyright("Copyright © RainbowMage 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 次の GUID は、このプロジェクトが COM に公開される場合の、typelib の ID です
-[assembly: Guid("49de6113-44b5-4675-96c4-27f4cfb639f2")]
+[assembly: Guid("ff125517-e48b-445c-886c-280579a1eab3")]
 
 // アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
 //

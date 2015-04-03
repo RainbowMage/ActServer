@@ -24,7 +24,7 @@ namespace RainbowMage.ActServer.Modules
         #region IDictionary<TKey, TValue>
         public void Add(TKey key, TValue value)
         {
-            if (!dict.Any(x => x.Key.CompareTo(key) == 0))
+            if (dict.All(x => x.Key.CompareTo(key) != 0))
             {
                 dict.Add(new KeyValuePair<TKey, TValue>(key, value));
             }

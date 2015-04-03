@@ -1,9 +1,5 @@
-﻿using Nancy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
+using Nancy;
 
 namespace RainbowMage.ActServer
 {
@@ -22,9 +18,11 @@ namespace RainbowMage.ActServer
         public static Response AsJson(this IResponseFormatter formatter, string jsonString, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
             var data = Encoding.UTF8.GetBytes(jsonString);
-            var response = new Response();
-            response.ContentType = "application/json";
-            response.Contents = stream => stream.Write(data, 0, data.Length);
+            var response = new Response
+            {
+                ContentType = "application/json",
+                Contents = stream => stream.Write(data, 0, data.Length)
+            };
 
             return response;
         }

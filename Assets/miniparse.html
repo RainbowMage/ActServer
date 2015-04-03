@@ -65,8 +65,8 @@
         }
 
     </style>
-    <script src="jquery-2.1.1.min.js" type="text/javascript"></script>
-    <script src="actserver.js" type="text/javascript"></script>
+    <script src="js/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <script src="js/actserver.js" type="text/javascript"></script>
     <script>
 
         //
@@ -154,7 +154,6 @@
         $(document).ready(function () {
 
             var server = "http://localhost:23456/";
-            var dataType = "RainbowMage.MiniParse";
             var sortKey = "encdps";
             var sortType = "NumericDescending";
 
@@ -162,10 +161,10 @@
                 "server": server,
                 "name": "miniparse",
                 "receive": function (data) {
-                    if (data.message == "hide") {
+                    if (data.body == "hide") {
                         $("#encounter").hide();
                         $("#combatantTable").hide();
-                    } else if (data.message == "show") {
+                    } else if (data.body == "show") {
                         $("#encounter").show();
                         $("#combatantTable").show();
                     }
@@ -180,7 +179,6 @@
             var dataReceiver = ActServerApi.startReceiveData({
                 "server": server,
                 "module": "miniparse",
-                "dataType": dataType,
                 "data": {
                     "sortKey": sortKey,
                     "sortType": sortType
