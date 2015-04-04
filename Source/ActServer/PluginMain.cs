@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,6 +25,9 @@ namespace RainbowMage.ActServer
         ManualResetEvent initCompleteEvent;
         IDisposable owinHost;
         NancyHost nancyHost;
+        Configuration config;
+        TabPage tabPage;
+        Label label;
 
         public PluginMain()
         {
@@ -43,6 +48,9 @@ namespace RainbowMage.ActServer
                 { GetModuleDirectory(), true }
             });
 
+            this.tabPage = pluginScreenSpace;
+            this.label = pluginStatusText;
+
             Task.Run(() => Init());
         }
 
@@ -50,6 +58,7 @@ namespace RainbowMage.ActServer
         {
             if (initCompleteEvent.WaitOne())
             {
+                SaveConfig();
                 if (owinHost != null) owinHost.Dispose();
                 if (nancyHost != null) nancyHost.Dispose();
                 if (resolver != null) resolver.Dispose();
@@ -64,18 +73,102 @@ namespace RainbowMage.ActServer
             try
             {
                 LoadModules();
-                const int port = 23456;
-                var baseUri = string.Format("http://+:{0}/", port);
+                LoadConfig();
+                InitializeConfigUI();
+
+                var baseUri = string.Format("http://+:{0}/", config.Port);
 
                 if (StartupOwinHost(baseUri)) { return; }
 
-                baseUri = string.Format("http://localhost:{0}/", port);
+                baseUri = string.Format("http://localhost:{0}/", config.Port);
                 StartupNancySelfHost(baseUri);
             }
             finally
             {
                 initCompleteEvent.Set();
             }
+        }
+
+        private void LoadConfig()
+        {
+            try
+            {
+                var configFilePath = GetConfigFilePath();
+                if (File.Exists(configFilePath))
+                {
+                    var xml = File.ReadAllText(configFilePath, Encoding.UTF8);
+                    this.config = Configuration.FromXml(xml);
+                }
+                else
+                {
+                    this.config = new Configuration();
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                    "Configuration load error: \n" + e.ToString(),
+                    "Configuration load error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                MessageBox.Show("Creating new configuration.");
+
+                this.config = new Configuration();
+            }
+        }
+
+        private void SaveConfig()
+        {
+            var configFilePath = GetConfigFilePath();
+            File.WriteAllText(configFilePath, this.config.ToXml(), Encoding.UTF8);
+        }
+
+        private void InitializeConfigUI()
+        {
+            var propertyGrid = new PropertyGrid();
+            propertyGrid.Dock = DockStyle.Fill;
+            propertyGrid.SelectedObject = this.config;
+            propertyGrid.PropertyValueChanged += (o, e) =>
+            {
+                var descriptor = e.ChangedItem.PropertyDescriptor;
+                if (descriptor == null) return;
+
+                // Get validator of the property and validate new value
+                var validationAttrs = descriptor.Attributes.OfType<ValidationAttribute>();
+                foreach (var validationAttr in validationAttrs)
+                {
+                    if (validationAttr.IsValid(e.ChangedItem.Value)) continue;
+
+                    // Revert if value is not valid
+                    descriptor.SetValue(propertyGrid.SelectedObject, e.OldValue);
+
+                    // Show error message box if error message was set
+                    if (string.IsNullOrEmpty(validationAttr.ErrorMessage))
+                    {
+                        MessageBox.Show(
+                            validationAttr.ErrorMessage,
+                            "Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
+                    return;
+                }
+
+                // Warn if the property need to restart to take effect
+                var restartAttr = descriptor.Attributes.OfType<RestartRequiredAttribute>().FirstOrDefault();
+                if (restartAttr != null)
+                {
+                    var message = !string.IsNullOrEmpty(restartAttr.Message)
+                        ? restartAttr.Message
+                        : "You need to restart plugin for this change to take effect.";
+                    MessageBox.Show(
+                            message,
+                            "Info",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Exclamation);
+                }
+            };
+            tabPage.Invoke(new Action(() => tabPage.Controls.Add(propertyGrid)));
         }
 
         private bool StartupOwinHost(string baseUri)
@@ -87,7 +180,7 @@ namespace RainbowMage.ActServer
             }
 
             // When failed startup, configure namespace reservation
-            if (UrlReservations.TryAdd(baseUri))
+            if (UrlReservation.TryAdd(baseUri))
             {
                 // Try startup again
                 if (TryStartupOwinHost(baseUri))
@@ -147,7 +240,7 @@ namespace RainbowMage.ActServer
                 new Bootstrapper(configuration),
                 new HostConfiguration()
                 {
-                    UrlReservations = new global::Nancy.Hosting.Self.UrlReservations() { CreateAutomatically = true },
+                    UrlReservations = new UrlReservations() { CreateAutomatically = true },
                 });
 
             nancyHost.Start();
@@ -201,6 +294,27 @@ namespace RainbowMage.ActServer
         private string GetModuleDirectory()
         {
             return Path.Combine(GetPluginDirectory(), "modules");
+        }
+
+        private static string GetConfigFilePath()
+        {
+            const string xmlFileName = "RainbowMage.ActServer.config.xml";
+
+            if (ActGlobals.oFormActMain != null)
+            {
+                return Path.Combine(
+                    ActGlobals.oFormActMain.AppDataFolder.FullName,
+                    "Config",
+                    xmlFileName);
+            }
+            else
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Advanced Combat Tracker",
+                    "Config",
+                    xmlFileName);
+            }
         }
     }
 }

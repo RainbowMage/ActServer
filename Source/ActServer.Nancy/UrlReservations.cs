@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Security.Principal;
 
-namespace RainbowMage.ActServer
+namespace RainbowMage.ActServer.Nancy
 {
-    static class UrlReservations
+    public static class UrlReservation
     {
         // Nancy/src/Nancy.Hosting.Self/NetSh.cs
 

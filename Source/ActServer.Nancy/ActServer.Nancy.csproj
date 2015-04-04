@@ -57,6 +57,7 @@
     <Compile Include="NancyWebSocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RootPathProvider.cs" />
+    <Compile Include="UrlReservations.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
