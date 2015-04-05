@@ -9,12 +9,14 @@ namespace RainbowMage.ActServer.Nancy
     public interface IBootstrapParams
     {
         string RootDirectory { get; }
+        string AssetDirectoryName { get; }
         HostType HostType { get; }
     }
 
     public class BootstrapParams : IBootstrapParams
     {
         public string RootDirectory { get; set; }
+        public string AssetDirectoryName { get; set; }
         public HostType HostType { get; set; }
     }
 

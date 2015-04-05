@@ -10,5 +10,15 @@ namespace RainbowMage.ActServer
     class RestartRequiredAttribute : Attribute
     {
         public string Message { get; set; }
+
+        public RestartRequiredAttribute()
+            : this("")
+        {
+        }
+
+        public RestartRequiredAttribute(string message)
+        {
+            Message = message;
+        }
     }
 }

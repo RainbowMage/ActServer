@@ -50,6 +50,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="StaticContentConventionBuilder.cs" />
     <Compile Include="NancyConfiguration.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="HostType.cs" />

@@ -26,16 +26,22 @@ namespace RainbowMage.ActServer.Nancy
             get { return new RootPathProvider(bootParams.RootDirectory); }
         }
 
+        //protected override DiagnosticsConfiguration DiagnosticsConfiguration
+        //{
+        //    get { return new DiagnosticsConfiguration { Password = @"123456" }; }
+        //}
+
         protected override void ConfigureConventions(NancyConventions nancyConventions)
         {
             base.ConfigureConventions(nancyConventions);
 
+            var assetDirectory = !string.IsNullOrEmpty(bootParams.AssetDirectoryName)
+                ? bootParams.AssetDirectoryName
+                : null;
+
             nancyConventions.StaticContentsConventions.Clear();
             nancyConventions.StaticContentsConventions.Add(
-                StaticContentConventionBuilder.AddDirectory("", "assets")
-            );
-            nancyConventions.StaticContentsConventions.Add(
-                StaticContentConventionBuilder.AddDirectory("/", "/index.html")
+                StaticContentConventionBuilder.AddDirectory("", assetDirectory, true)
             );
         }
 
@@ -45,5 +51,15 @@ namespace RainbowMage.ActServer.Nancy
 
             container.Register(bootParams);
         }
+
+        protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
+        {
+            base.ApplicationStartup(container, pipelines);
+
+            StaticConfiguration.Caching.EnableRuntimeViewDiscovery = true;
+            StaticConfiguration.Caching.EnableRuntimeViewUpdates = true;
+        }
     }
+
+
 }

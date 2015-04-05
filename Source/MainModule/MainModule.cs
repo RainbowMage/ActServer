@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Advanced_Combat_Tracker;
 using Nancy;
 using Nancy.Routing;
 using RainbowMage.ActServer.Nancy;
@@ -19,6 +20,13 @@ namespace RainbowMage.ActServer.Modules
                 {
                     context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
                 }
+            };
+
+            Get[@"/{dir?}"] = parameters =>
+            {
+                string dir = parameters.dir;
+                var path = Join(bootParams.AssetDirectoryName, dir, "index.html");
+                return Response.AsFile(path, "text/html");
             };
 
             Get["/command/version"] = _ =>
@@ -59,6 +67,17 @@ namespace RainbowMage.ActServer.Modules
             return copyrightAttrs.Any()
                 ? ((AssemblyCopyrightAttribute)copyrightAttrs.First()).Copyright
                 : "";
+        }
+
+        private static string Join(string asset, string dir, string index)
+        {
+            var result = "";
+
+            if (!string.IsNullOrEmpty(asset)) result += asset + "/";
+            if (!string.IsNullOrEmpty(dir)) result += dir += "/";
+            result += index;
+
+            return result;
         }
     }
 }

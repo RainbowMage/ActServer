@@ -52,6 +52,7 @@ namespace Test
             else
             {
                 plugin.DeInitPlugin();
+
                 tabControl.TabPages.Clear();
                 statusLabel.Text = "";
                 plugin = null;

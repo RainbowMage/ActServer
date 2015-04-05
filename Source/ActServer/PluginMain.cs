@@ -98,10 +98,7 @@ namespace RainbowMage.ActServer
                 {
                     var xml = File.ReadAllText(configFilePath, Encoding.UTF8);
                     this.config = Configuration.FromXml(xml);
-                }
-                else
-                {
-                    this.config = new Configuration();
+                    return;
                 }
             }
             catch (Exception e)
@@ -112,9 +109,16 @@ namespace RainbowMage.ActServer
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 MessageBox.Show("Creating new configuration.");
-
-                this.config = new Configuration();
             }
+
+            SetNewConfig();
+        }
+
+        private void SetNewConfig()
+        {
+            this.config = new Configuration();
+            this.config.RootPath = GetPluginDirectory();
+            this.config.AssetDirectoryName = "assets";
         }
 
         private void SaveConfig()
@@ -201,6 +205,7 @@ namespace RainbowMage.ActServer
                     var configuration = new BootstrapParams()
                     {
                         RootDirectory = GetPluginDirectory(),
+                        AssetDirectoryName = config.AssetDirectoryName,
                         HostType = HostType.OwinSelfHost
                     };
                     var nancyOptions = new NancyOptions()
@@ -232,6 +237,7 @@ namespace RainbowMage.ActServer
             var configuration = new BootstrapParams()
             {
                 RootDirectory = GetPluginDirectory(),
+                AssetDirectoryName = config.AssetDirectoryName,
                 HostType = HostType.NancySelfHost
             };
 
