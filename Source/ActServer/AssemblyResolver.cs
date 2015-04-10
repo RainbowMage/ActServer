@@ -40,6 +40,8 @@ namespace RainbowMage.ActServer
             // Directories プロパティで指定されたディレクトリを基準にアセンブリを検索する
             foreach (var directory in this.Directories)
             {
+                if (!Directory.Exists(directory.Key)) continue;
+
                 var searchDirectories = new List<string>();
                 searchDirectories.Add(directory.Key);
 

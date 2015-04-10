@@ -18,10 +18,10 @@ namespace RainbowMage.ActServer.Modules
                    UseSimpleDictionaryFormat = true
                });
 
-        [DataMember(Name = "Encounter")]
+        [DataMember(Name = "encounter")]
         public Dictionary<string, string> Encounter { get; set; }
 
-        [DataMember(Name = "Combatant")]
+        [DataMember(Name = "combatants")]
         public OrderedDictionary<string, Dictionary<string, string>> Combatant { get; set; }
 
         [DataMember(Name = "isActive")]

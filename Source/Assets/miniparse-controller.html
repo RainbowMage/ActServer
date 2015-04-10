@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="libs/jquery-2.1.3.min.js"></script>
+    <script src="scripts/ActServerApi.js"></script>
+    <script src="scripts/ActServerApi.Messaging.js"></script>
+    <script src="scripts/Common.js"></script>
+    <script>
+        $(document).ready(function () {
+            server = ActServerApi.ActServer();
+            messenger = ActServerApi.Messaging.createMessenger(server, {
+                name: "miniparse-control"
+            });
+            messenger.start();
+        });
+
+        function showMiniParse() {
+            messenger.send({ to: "miniparse", body: "show" });
+        }
+
+        function hideMiniParse() {
+            messenger.send({ to: "miniparse", body: "hide" });
+        }
+    </script>
+</head>
+<body>
+    <button onclick="showMiniParse();">Show Miniparse</button>
+    <button onclick="hideMiniParse();">Hide Miniparse</button>
+</body>
+</html>

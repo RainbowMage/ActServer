@@ -112,9 +112,7 @@ move "$(OutDir)Nancy.dll" %25LIBOUT%25
 move "$(OutDir)Nancy.Hosting.Self.dll" %25LIBOUT%25
 move "$(OutDir)Nancy.Owin.dll" %25LIBOUT%25
 move "$(OutDir)Owin.dll" %25LIBOUT%25
-)
-
-xcopy /Y /R /E /S "$(SolutionDir)..\Assets\*" "$(OutDir)assets\"</PostBuildEvent>
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

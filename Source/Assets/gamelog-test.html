@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Nancy + Owin WebSocket Test</title>
+    <style>
+        body::-webkit-scrollbar { 
+            display: none; 
+        }
+        html::-webkit-scrollbar { 
+            display: none; 
+        }
+        #container::-webkit-scrollbar { 
+            display: none; 
+        }
+        * { font-size: 0.8em; }
+        html, body { height: 100%; margin: 0; padding: 0;  overflow: hidden; }
+        #container { height: 100%; display: flex; flex-flow: column; }
+        #header { flex: 0 0 auto; }
+        #output { flex: 0 1 auto; overflow: scroll; }
+        #output p { line-height: 90%; }
+        .error { color: red; }
+    </style>
+    <script src="libs/jquery-2.1.3.min.js"></script>
+    <script src="scripts/ActServerApi.js"></script>
+    <script src="scripts/ActServerApi.GameLog.js"></script>
+    <script src="scripts/Common.js"></script>
+    <script>
+        $(document).ready(function () {
+            var server = new ActServerApi.ActServer();
+            var receiver = new ActServerApi.GameLog.GameLogReceiver(server);
+            receiver.onreceive = function (log) {
+                $("#output").append($("<p>" + log.text + "</p>"));
+            }
+            receiver.onerror = function (error) {
+                $("#output").append($("<p class='error'>" + error.message + "</p>"));
+            }
+            receiver.start();
+        });
+    </script>
+</head>
+<body style=" max-height: 100%;">
+    <div id="container" style="overflow:scroll;">
+        <div id="header">
+            <h1>Log receiving test</h1>
+            <button onclick="output.innerHTML = ''">Clear</button>
+        </div>
+        <div id="output" style=""></div>
+    </div>
+</body>
+</html>

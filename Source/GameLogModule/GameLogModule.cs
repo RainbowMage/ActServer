@@ -2,7 +2,6 @@
 using Advanced_Combat_Tracker;
 using RainbowMage.ActServer.Nancy;
 using Nancy;
-using RainbowMage.ActServer.Nancy;
 
 namespace GameLogModule
 {
@@ -15,7 +14,7 @@ namespace GameLogModule
                 return;
             }
 
-            Get["/websocket/log"] = _ =>
+            Get["/websocket/gamelog"] = _ =>
             {
                 if (ActGlobals.oFormActMain != null)
                 {
@@ -24,12 +23,8 @@ namespace GameLogModule
                     {
                         try
                         {
-                            var log = string.Format(
-                                "{0}:{1}:{2}",
-                                e.detectedTime,
-                                e.detectedType,
-                                e.logLine);
-                            await webSocket.SendTextAsync(log);
+                            var log = new GameLog(e.detectedTime, e.detectedType, e.detectedZone, e.inCombat, e.logLine);
+                            await webSocket.SendTextAsync(log.GetJson());
                         }
                         catch (Exception ex)
                         {

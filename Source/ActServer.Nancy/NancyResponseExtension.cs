@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Nancy;
+using System;
 
 namespace RainbowMage.ActServer.Nancy
 {
@@ -17,14 +18,34 @@ namespace RainbowMage.ActServer.Nancy
 
         public static Response AsJson(this IResponseFormatter formatter, string jsonString, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
-            var data = Encoding.UTF8.GetBytes(jsonString);
-            var response = new Response
+            try
             {
-                ContentType = "application/json",
-                Contents = stream => stream.Write(data, 0, data.Length)
-            };
+                var data = Encoding.UTF8.GetBytes(jsonString);
+                var response = new Response
+                {
+                    ContentType = "application/json",
+                    Contents = stream =>
+                    {
+                        try
+                        {
+                            if (stream.CanWrite)
+                            {
+                                stream.Write(data, 0, data.Length);
+                            }
+                        }
+                        catch (Exception)
+                        {
 
-            return response;
+                        }
+                    }
+                };
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                return formatter.AsJsonErrorMessage(e.ToString());
+            }
         }
     }
 }

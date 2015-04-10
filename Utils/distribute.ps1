@@ -1,15 +1,22 @@
 ﻿Import-Module $PSScriptRoot\PS-Zip.psm1
 
+$root = Join-Path $PSScriptRoot ..
+$buildFolder = Join-Path $root "Build\Release"
+
+# Remove build folder if already exists
+if ( Test-Path $buildFolder -PathType Container ) {
+	Remove-Item -Recurse -Force $buildFolder
+}
+
 # Build
 ../build.bat
 
 if ( $LastExitCode -ne 0 ) {
+	Write-Host "Build failed."
 	exit 1
 }
 
 # Set archive folder name
-$root = Join-Path $PSScriptRoot ..
-$buildFolder = Join-Path $root "Build\Release"
 $mainAssemblyFile = "ActServer.dll"
 $assemblyPath = Join-Path $buildFolder $mainAssemblyFile
 $version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($assemblyPath).FileVersion

@@ -16,7 +16,7 @@ if not exist %DOTNET_PATH% (
 	goto END
 )
 
-%DOTNET_PATH%\msbuild /t:Clean;Build /p:Configuration=Release "%~dp0\Source\ActServer.sln"
+%DOTNET_PATH%\msbuild /t:Rebuild /p:Configuration=Release "%~dp0\Source\ActServer.sln"
 
 if %ERRORLEVEL% neq 0 (
 	echo ERROR: Build failed with code %ERRORLEVEL%.
