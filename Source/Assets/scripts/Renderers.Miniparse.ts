@@ -243,12 +243,12 @@ module Renderers.Miniparse {
                         cell.innerHTML = MiniparseRenderer.getCellString(cellOption.html, combatant, i);
                     }
                     // 幅設定
-                    if (!Type.isNumber(cellOption.width)) {
+                    if (Type.isNumber(cellOption.width)) {
                         cell.style.width = cellOption.width;
                         cell.style.maxWidth = cellOption.width;
                     }
                     // 行構え設定
-                    if (!Type.isString(cellOption.align)) {
+                    if (Type.isString(cellOption.align)) {
                         cell.style.textAlign = cellOption.align;
                     }
                     // エフェクト実行
@@ -260,7 +260,7 @@ module Renderers.Miniparse {
             }
 
             // tbody が既に存在していたら置換、そうでないならテーブルに追加
-            if (!Type.isUndefined(oldTableBody)) {
+            if (Type.isObject(oldTableBody)) {
                 this.tableElement.replaceChild(newTableBody, oldTableBody);
             }
             else {

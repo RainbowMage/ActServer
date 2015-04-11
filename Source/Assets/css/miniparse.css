@@ -22,6 +22,16 @@ html {
     background-color: transparent;
 }
 
+body {
+    /* リサイズ用のハンドル
+     * リサイズができる場所はウィンドウ右下の16x16ピクセルの場所
+     * この部分が完全に透明だとマウス入力が透過してしまってサイズを変更できなくなる */
+    background-image: url(../images/handle.png);
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+}
+
 #combatantTable {
     width: 100%;
     table-layout: fixed;
