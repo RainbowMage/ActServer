@@ -15,10 +15,23 @@
         isActive: boolean;
     }
 
+    export class SortType {
+        constructor(public value: string) { }
+        toString() { return this.value; }
+
+        static NONE = new SortType("None");
+        static STRING_ASCENDING = new SortType("StringAscending");
+        static STRING_DESCENDING = new SortType("StringDescending");
+        static NUMERIC_ASCENDING = new SortType("NumericAscending");
+        static NUMERIC_DESCENDING = new SortType("NumericDescending");
+    }
+
     export interface IMiniparseOption {
         interval: number;
         timeout: number;
         retryInterval: number;
+        sortKey: string;
+        sortType: SortType;
     }
 
     /**
@@ -36,7 +49,9 @@
             private option: IMiniparseOption = {
                 interval: 1000,
                 timeout: 5000,
-                retryInterval: 10000
+                retryInterval: 10000,
+                sortKey: 'EncDPS',
+                sortType: SortType.NUMERIC_DESCENDING
             })
         {
             this.timestamp = new Date().getTime();
@@ -56,6 +71,10 @@
                 var url = this.actServer.server + "command/miniparse";
                 $.ajax(url, {
                     //contentType: "application/json",
+                    data: {
+                        sortKey: this.option.sortKey,
+                        sortType: this.option.sortType.toString()
+                    },
                     dataType: 'json',
                     timeout: this.option.timeout,
                     success: (data) => {
