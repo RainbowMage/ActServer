@@ -28,6 +28,7 @@ namespace RainbowMage.ActServer
         Configuration config;
         TabPage tabPage;
         Label label;
+        ILog log;
 
         public PluginMain()
         {
@@ -47,6 +48,10 @@ namespace RainbowMage.ActServer
                 { GetPluginDirectory(), false },
                 { GetModuleDirectory(), true }
             });
+            resolver.AssemblyLoaded += (o, e) =>
+            {
+                Console.WriteLine(e);
+            };
 
             this.tabPage = pluginScreenSpace;
             this.label = pluginStatusText;
@@ -72,6 +77,7 @@ namespace RainbowMage.ActServer
         {
             try
             {
+                InitializeLog();
                 LoadModules();
                 LoadConfig();
                 InitializeConfigUI();
@@ -114,6 +120,19 @@ namespace RainbowMage.ActServer
             SetNewConfig();
         }
 
+        private void InitializeLog()
+        {
+            this.log = new Log();
+            this.log.OnLog += (o, e) =>
+            {
+                Console.WriteLine("{0}: {1}: {2}", e.Log.Timestamp, e.Log.Level, e.Log.Message);
+            };
+            this.resolver.AssemblyLoaded += (o, e) =>
+            {
+                this.log.Info("Assembly loaded: {0}", e.LoadedAssembly);
+            };
+        }
+
         private void SetNewConfig()
         {
             this.config = new Configuration();
@@ -129,6 +148,12 @@ namespace RainbowMage.ActServer
 
         private void InitializeConfigUI()
         {
+            var configTab = new TabControl();
+            configTab.Dock = DockStyle.Fill;
+
+            // Property tab page
+            var propertyTabPage = new TabPage();
+            propertyTabPage.Text = "Property";
             var propertyGrid = new PropertyGrid();
             propertyGrid.Dock = DockStyle.Fill;
             propertyGrid.SelectedObject = this.config;
@@ -172,7 +197,29 @@ namespace RainbowMage.ActServer
                             MessageBoxIcon.Exclamation);
                 }
             };
-            tabPage.Invoke(new Action(() => tabPage.Controls.Add(propertyGrid)));
+
+            // Log tab page
+            var logTabPage = new TabPage();
+            logTabPage.Text = "Log";
+            var logList = new ListBox();
+            logList.Dock = DockStyle.Fill;
+            log.OnLog += (o, e) =>
+            {
+                logList.Items.Add(
+                    string.Format("{0}: {1}: {2}",
+                        e.Log.Timestamp,
+                        e.Log.Level, 
+                        e.Log.Message));
+            };
+
+            tabPage.Invoke(new Action(() =>
+            {
+                propertyTabPage.Controls.Add(propertyGrid);
+                logTabPage.Controls.Add(logList);
+                configTab.Controls.Add(propertyTabPage);
+                configTab.Controls.Add(logTabPage);
+                tabPage.Controls.Add(configTab);
+            }));
         }
 
         private bool StartupOwinHost(string baseUri)
@@ -206,11 +253,13 @@ namespace RainbowMage.ActServer
                     {
                         RootDirectory = GetPluginDirectory(),
                         AssetDirectoryName = config.AssetDirectoryName,
-                        HostType = HostType.OwinSelfHost
+                        ConfigDirectory = GetConfigDirectory(),
+                        HostType = HostType.OwinSelfHost,
+                        //Log = log
                     };
                     var nancyOptions = new NancyOptions()
                     {
-                        Bootstrapper = new Bootstrapper(configuration)
+                        Bootstrapper = new Bootstrapper(configuration, this.log)
                     };
 
                     app.UseNancy(nancyOptions);
@@ -238,12 +287,14 @@ namespace RainbowMage.ActServer
             {
                 RootDirectory = GetPluginDirectory(),
                 AssetDirectoryName = config.AssetDirectoryName,
-                HostType = HostType.NancySelfHost
+                ConfigDirectory = GetConfigDirectory(),
+                HostType = HostType.NancySelfHost,
+                //Log = log
             };
 
             nancyHost = new NancyHost(
                 new Uri(baseUri),
-                new Bootstrapper(configuration),
+                new Bootstrapper(configuration, this.log),
                 new HostConfiguration()
                 {
                     UrlReservations = new UrlReservations() { CreateAutomatically = true },
@@ -264,10 +315,11 @@ namespace RainbowMage.ActServer
                 try
                 {
                     var assembly = Assembly.LoadFrom(file);
+                    log.Info("LoadModules: {0} loaded", file);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("{0}: {1}", file, e);
+                    log.Error("LoadModules: {0}: {1}", file, e);
                 }
             }
         }
@@ -302,25 +354,26 @@ namespace RainbowMage.ActServer
             return Path.Combine(GetPluginDirectory(), "modules");
         }
 
-        private static string GetConfigFilePath()
+        private static string GetConfigDirectory()
         {
-            const string xmlFileName = "RainbowMage.ActServer.config.xml";
-
             if (ActGlobals.oFormActMain != null)
             {
                 return Path.Combine(
                     ActGlobals.oFormActMain.AppDataFolder.FullName,
-                    "Config",
-                    xmlFileName);
+                    "Config");
             }
             else
             {
                 return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     "Advanced Combat Tracker",
-                    "Config",
-                    xmlFileName);
+                    "Config");
             }
+        }
+
+        private static string GetConfigFilePath()
+        {
+            return Path.Combine(GetConfigDirectory(), "RainbowMage.ActServer.config.xml");
         }
     }
 }

@@ -15,10 +15,12 @@ namespace RainbowMage.ActServer.Nancy
     public class Bootstrapper : DefaultNancyBootstrapper
     {
         private IBootstrapParams bootParams;
+        private ILog log;
 
-        public Bootstrapper(IBootstrapParams bootParams)
+        public Bootstrapper(IBootstrapParams bootParams, ILog log)
         {
             this.bootParams = bootParams;
+            this.log = log;
         }
 
         protected override IRootPathProvider RootPathProvider
@@ -50,6 +52,7 @@ namespace RainbowMage.ActServer.Nancy
             base.ConfigureApplicationContainer(container);
 
             container.Register(bootParams);
+            container.Register(log);
         }
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)

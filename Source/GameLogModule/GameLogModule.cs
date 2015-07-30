@@ -7,8 +7,10 @@ namespace GameLogModule
 {
     public class GameLogModule : NancyModule
     {
-        public GameLogModule(IBootstrapParams bootParams)
+        public GameLogModule(IBootstrapParams bootParams, ILog log)
         {
+            log.Info("GameLogModule loaded.");
+
             if (!bootParams.IsWebSocketAvailable())
             {
                 return;
@@ -23,8 +25,8 @@ namespace GameLogModule
                     {
                         try
                         {
-                            var log = new GameLog(e.detectedTime, e.detectedType, e.detectedZone, e.inCombat, e.logLine);
-                            await webSocket.SendTextAsync(log.GetJson());
+                            var gamelog = new GameLog(e.detectedTime, e.detectedType, e.detectedZone, e.inCombat, e.logLine);
+                            await webSocket.SendTextAsync(gamelog.GetJson());
                         }
                         catch (Exception ex)
                         {

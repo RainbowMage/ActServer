@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace RainbowMage.ActServer.Modules
 {
     [DataContract]
-    class MiniParseResponse
+    public class MiniParseResponse
     {
         private static readonly DataContractJsonSerializer JsonSerializer =
                new DataContractJsonSerializer(typeof(MiniParseResponse), new DataContractJsonSerializerSettings()

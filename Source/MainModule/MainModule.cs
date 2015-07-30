@@ -12,8 +12,10 @@ namespace RainbowMage.ActServer.Modules
 {
     public class MainModule : NancyModule
     {
-        public MainModule(IBootstrapParams bootParams, IRouteCacheProvider route)
+        public MainModule(IBootstrapParams bootParams, IRouteCacheProvider route, ILog log)
         {
+            log.Info("MainModule loaded.");
+
             this.After += context =>
             {
                 if (context.Response != null)
@@ -24,6 +26,7 @@ namespace RainbowMage.ActServer.Modules
 
             Get[@"/{dir?}"] = parameters =>
             {
+                log.Debug("MainModule: Asset request from {0}: {1}", Request.UserHostAddress, Request.Path);
                 string dir = parameters.dir;
                 var path = Join(bootParams.AssetDirectoryName, dir, "index.html");
                 return Response.AsFile(path, "text/html");
@@ -31,6 +34,7 @@ namespace RainbowMage.ActServer.Modules
 
             Get["/command/version"] = _ =>
             {
+                log.Debug("MainModule: Version command from {0}", Request.UserHostAddress, Request.Path);
                 var asm = typeof(PluginMain).Assembly;
                 var modules = route.GetCache().Select(x => new
                 {

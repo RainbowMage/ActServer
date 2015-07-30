@@ -24,8 +24,10 @@ namespace MessagingModule
             messageQueue = new Queue<Message>();
         }
 
-        public MessagingModule(IBootstrapParams bootParams)
+        public MessagingModule(IBootstrapParams bootParams, ILog log)
         {
+            log.Info("MessagingModule loaded.");
+            
             this.After += context =>
             {
                 if (context.Response != null)

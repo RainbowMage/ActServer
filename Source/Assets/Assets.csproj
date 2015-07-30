@@ -17,6 +17,7 @@
     <IISExpressUseClassicPipelineMode />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <ItemGroup>
     <Content Include="css\miniparse.css">
@@ -45,6 +46,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="scripts\ActServerApi.Config.ts" />
     <TypeScriptCompile Include="scripts\libs\jquery.d.ts" />
     <TypeScriptCompile Include="scripts\ActServerApi.ts" />
     <TypeScriptCompile Include="scripts\ActServerApi.Messaging.ts" />

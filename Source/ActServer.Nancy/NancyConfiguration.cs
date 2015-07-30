@@ -10,6 +10,7 @@ namespace RainbowMage.ActServer.Nancy
     {
         string RootDirectory { get; }
         string AssetDirectoryName { get; }
+        string ConfigDirectory { get; }
         HostType HostType { get; }
     }
 
@@ -17,6 +18,7 @@ namespace RainbowMage.ActServer.Nancy
     {
         public string RootDirectory { get; set; }
         public string AssetDirectoryName { get; set; }
+        public string ConfigDirectory { get; set; }
         public HostType HostType { get; set; }
     }
 
