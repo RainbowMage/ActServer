@@ -52,8 +52,12 @@ module ActServerApi.GameLog {
                     };
                     this.onreceive(log);
                 };
-                this.webSocket.onerror = (e) => {
-                    this.onerror({ message: e.message });
+                this.webSocket.onclose = (e) => {
+                    if (e.code != 1000) {
+                        this.onerror({
+                            message: "WebSocket has been closed with code " + e.code.toString() + "."
+                        });
+                    }
                 };
             } catch (e) {
                 this.onerror({ message: e });

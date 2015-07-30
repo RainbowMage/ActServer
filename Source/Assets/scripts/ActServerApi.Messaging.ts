@@ -114,8 +114,12 @@ module ActServerApi.Messaging {
                         this.onerror({ message: "Message object is not valid." });
                     }
                 };
-                this.webSocket.onerror = (e) => {
-                    this.onerror({ message: e.message, original: e });
+                this.webSocket.onclose = (e) => {
+                    if (e.code != 1000) {
+                        this.onerror({
+                            message: "WebSocket has been closed with code " + e.code.toString() + "."
+                        });
+                    }
                 };
             } catch (e) {
                 this.onerror({ message: e, original: e });
