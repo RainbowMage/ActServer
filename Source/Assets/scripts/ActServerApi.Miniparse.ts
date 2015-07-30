@@ -50,7 +50,7 @@
                 interval: 1000,
                 timeout: 5000,
                 retryInterval: 10000,
-                sortKey: 'EncDPS',
+                sortKey: 'encdps',
                 sortType: SortType.NUMERIC_DESCENDING
             })
         {

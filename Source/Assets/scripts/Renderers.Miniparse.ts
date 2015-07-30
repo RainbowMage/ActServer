@@ -21,7 +21,7 @@ $(document).ready(() => {
             ],
             // Define cells
             columnCells: [
-                { text: (combatant, index) => index.toString() },
+                { text: (combatant, index) => (index + 1).toString() },
                 { text: "{name}", width: "25%" },
                 { text: "{Job}", width: "8%", align: "center" },
                 { text: "{encdps}", width: "16%", align: "right" },
@@ -83,7 +83,7 @@ module Renderers.Miniparse {
         html?: string|CellBodyFunc;
         width?: string;
         align?: string;
-        //class?: string;
+        class?: string;
         effect?: CellEffectFunc;
     }
 
@@ -238,9 +238,15 @@ module Renderers.Miniparse {
                     var cellOption = this.option.tableOption.columnCells[i];
                     // テキスト設定
                     if (!Type.isUndefined(cellOption.text)) {
-                        cell.innerText = MiniparseRenderer.getCellString(cellOption.text, combatant, i);
+                        cell.innerText = MiniparseRenderer.getCellString(cellOption.text, combatant, combatantIndex);
                     } else if (!Type.isUndefined(cellOption.html)) {
-                        cell.innerHTML = MiniparseRenderer.getCellString(cellOption.html, combatant, i);
+                        cell.innerHTML = MiniparseRenderer.getCellString(cellOption.html, combatant, combatantIndex);
+                    }
+                    // クラス設定
+                    if (Type.isString(cellOption.class)) {
+                        for (var c in cellOption.class.split(" ")) {
+                            cell.classList.add(c);
+                        }
                     }
                     // 幅設定
                     if (Type.isNumber(cellOption.width)) {
