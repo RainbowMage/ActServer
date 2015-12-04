@@ -79,7 +79,7 @@ Libraries used by ActServer:
     Licensed under the Apache License Version 2.0.
 
  * Type definitions for jQuery 1.10.x / 2.0.x
-   https://github.com/borisyankov/DefinitelyTyped
+   https://github.com/borisyankov/DefinitelyTyped/jquery
 
     Project: http://jquery.com/
     Definitions by: Boris Yankov <https://github.com/borisyankov/>, 
