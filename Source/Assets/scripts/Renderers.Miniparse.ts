@@ -203,7 +203,7 @@ module Renderers.Miniparse {
                     cell.innerHTML = define.html;
                 }
                 // 幅設定
-                if (Type.isNumber(define.width)) {
+                if (Type.isNumber(define.width) || Type.isString(define.width)) {
                     cell.style.width = define.width;
                     cell.style.maxWidth = define.width;
                 }
@@ -249,7 +249,7 @@ module Renderers.Miniparse {
                         }
                     }
                     // 幅設定
-                    if (Type.isNumber(cellOption.width)) {
+                    if (Type.isNumber(cellOption.width) || Type.isString(cellOption.width)) {
                         cell.style.width = cellOption.width;
                         cell.style.maxWidth = cellOption.width;
                     }
