@@ -29,6 +29,7 @@ namespace RainbowMage.ActServer
         TabPage tabPage;
         Label label;
         ILog log;
+        Thread uiThread;
 
         public PluginMain()
         {
@@ -56,18 +57,18 @@ namespace RainbowMage.ActServer
             this.tabPage = pluginScreenSpace;
             this.label = pluginStatusText;
 
+            this.uiThread = Thread.CurrentThread;
+
             Task.Run(() => Init());
+
+            // Make sure to dispose self host objects.
+            Application.ApplicationExit += DeInit;
         }
 
         public void DeInitPlugin()
         {
-            if (initCompleteEvent.WaitOne())
-            {
-                SaveConfig();
-                if (owinHost != null) owinHost.Dispose();
-                if (nancyHost != null) nancyHost.Dispose();
-                if (resolver != null) resolver.Dispose();
-            }
+            Application.ApplicationExit -= DeInit;
+            DeInit(null, null);
         }
 
         #endregion
@@ -83,7 +84,6 @@ namespace RainbowMage.ActServer
                 InitializeConfigUI();
 
                 var baseUri = string.Format("http://+:{0}/", config.Port);
-
                 if (StartupOwinHost(baseUri)) { return; }
 
                 baseUri = string.Format("http://localhost:{0}/", config.Port);
@@ -92,6 +92,17 @@ namespace RainbowMage.ActServer
             finally
             {
                 initCompleteEvent.Set();
+            }
+        }
+
+        private void DeInit(object sender, EventArgs e)
+        {
+            if (initCompleteEvent.WaitOne())
+            {
+                SaveConfig();
+                if (owinHost != null) owinHost.Dispose();
+                if (nancyHost != null) nancyHost.Dispose();
+                if (resolver != null) resolver.Dispose();
             }
         }
 
@@ -212,14 +223,26 @@ namespace RainbowMage.ActServer
                         e.Log.Message));
             };
 
-            tabPage.Invoke(new Action(() =>
+            var addControls = new Action(() =>
             {
                 propertyTabPage.Controls.Add(propertyGrid);
                 logTabPage.Controls.Add(logList);
                 configTab.Controls.Add(propertyTabPage);
                 configTab.Controls.Add(logTabPage);
                 tabPage.Controls.Add(configTab);
-            }));
+            });
+
+            if (tabPage.FindForm().IsHandleCreated)
+            {
+                addControls();
+            }
+            else
+            {
+                tabPage.FindForm().HandleCreated += (o, e) =>
+                {
+                    tabPage.Invoke(addControls);
+                };
+            }
         }
 
         private bool StartupOwinHost(string baseUri)
@@ -251,11 +274,10 @@ namespace RainbowMage.ActServer
                 {
                     var configuration = new BootstrapParams()
                     {
-                        RootDirectory = GetPluginDirectory(),
+                        RootDirectory = config.RootPath,
                         AssetDirectoryName = config.AssetDirectoryName,
                         ConfigDirectory = GetConfigDirectory(),
-                        HostType = HostType.OwinSelfHost,
-                        //Log = log
+                        HostType = HostType.OwinSelfHost
                     };
                     var nancyOptions = new NancyOptions()
                     {
@@ -285,11 +307,10 @@ namespace RainbowMage.ActServer
         {
             var configuration = new BootstrapParams()
             {
-                RootDirectory = GetPluginDirectory(),
+                RootDirectory = config.RootPath,
                 AssetDirectoryName = config.AssetDirectoryName,
                 ConfigDirectory = GetConfigDirectory(),
-                HostType = HostType.NancySelfHost,
-                //Log = log
+                HostType = HostType.NancySelfHost
             };
 
             nancyHost = new NancyHost(

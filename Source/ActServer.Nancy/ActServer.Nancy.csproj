@@ -50,6 +50,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="IPluginEventNotifier.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogEntry.cs" />
     <Compile Include="StaticContentConventionBuilder.cs" />

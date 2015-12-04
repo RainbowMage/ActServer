@@ -30,7 +30,7 @@ namespace GameLogModule
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex);
+                            log.Error("GameLogModule: {0}", ex);
                         }
                     });
                     ActGlobals.oFormActMain.OnLogLineRead += handler;
