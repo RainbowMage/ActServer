@@ -73,6 +73,7 @@ module Renderers.Miniparse {
         width?: string;
         align?: string;
         span?: number;
+        class?: string;
     }
 
     type CellBodyFunc = { (combatant: IDictionary<string>, index: number): string }
@@ -102,6 +103,9 @@ module Renderers.Miniparse {
             this.encounterElement.id = "encounter";
             this.option.targetElement.appendChild(this.encounterElement);
             this.option.targetElement.appendChild(this.tableElement);
+
+            // Create colgroups for table element
+            this.updateTableColumns();
 
             // Create and initialize API instances
             this.server = new ActServerApi.ActServer("http://localhost:23456/");
@@ -186,6 +190,28 @@ module Renderers.Miniparse {
         }
 
         /**
+         * Update table column definitions.
+         */
+        private updateTableColumns(): void {
+            var colgroups = this.tableElement.getElementsByTagName("colgroup");
+            if (colgroups.length > 0) {
+                return;
+            }
+
+            for (var column of this.option.tableOption.columnCells) {
+                var colgroup = document.createElement("colgroup");
+                if (Type.isString(column.class)) {
+                    colgroup.classList.add(column.class);
+                }
+                if (Type.isNumber(column.width) || Type.isString(column.width)) {
+                    colgroup.style.width = column.width;
+                    colgroup.style.maxWidth = column.width;
+                }
+                this.tableElement.appendChild(colgroup);
+            }
+        }
+
+        /**
          * Update table header
          */
         private updateTableHeader(): void {
@@ -201,6 +227,12 @@ module Renderers.Miniparse {
                     cell.innerText = define.text;
                 } else if (Type.isString(define.html)) {
                     cell.innerHTML = define.html;
+                }
+                // クラス設定
+                if (Type.isString(define.class)) {
+                    for (var c in define.class.split(" ")) {
+                        cell.classList.add(c);
+                    }
                 }
                 // 幅設定
                 if (Type.isNumber(define.width) || Type.isString(define.width)) {
